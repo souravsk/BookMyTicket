@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/souravsk/BookMyTicket/src/lib/persistence"
 )
 
 // eventServiceHandler: Defines a struct representing an event service handler.
@@ -36,6 +37,9 @@ func (eh *eventServiceHandler) FindEventHandler(c *gin.Context) {
 
 	var event persistence.Event
 	var err error
+
+	// Initialize event to an empty Event struct to avoid nil pointer dereference
+	event = persistence.Event{}
 
 	switch strings.ToLower(criteria) {
 	case "name":
@@ -82,4 +86,5 @@ func (eh *eventServiceHandler) NewEventHandler(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"id": id})
+
 }
