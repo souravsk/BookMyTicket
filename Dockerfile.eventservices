@@ -1,0 +1,32 @@
+# Builder stage
+FROM golang AS builder
+
+# Set the working directory in the container
+WORKDIR /go/src/github.com/souravsk/BookMyTicket
+
+# Copy the local package files to the container's workspace
+COPY . .
+
+WORKDIR src/eventservices
+
+# Build the Go application
+RUN CGO_ENABLED=0 GOOS=linux go build -o eventservices
+
+# Final stage
+FROM alpine:latest
+
+# Install curl in the final image
+RUN apk --no-cache add curl
+
+# Set the working directory in the container
+WORKDIR /app
+
+# Copy the necessary files from the builder stage
+COPY --from=builder /go/src/github.com/souravsk/BookMyTicket/src/lib/configuration/config.json /app/config.json
+COPY --from=builder /go/src/github.com/souravsk/BookMyTicket/src/eventservices/eventservices /eventservices
+
+# Expose the port
+EXPOSE 8888
+
+# Command to run the application
+CMD ["/bin/sh", "-c", "/eventservices"]
