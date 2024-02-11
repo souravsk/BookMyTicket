@@ -6,10 +6,12 @@ import (
 	"log"
 
 	"github.com/souravsk/BookMyTicket/src/eventservices/rest"
+	"github.com/souravsk/BookMyTicket/src/lib/configuration"
+	"github.com/souravsk/BookMyTicket/src/lib/persistence/dblayer"
 )
 
 func main() {
-	confPath := flag.String("conf", `.\configuration\config.json`, "flag to set the path to the configuration file")
+	confPath := flag.String("conf", `/configuration/config.json`, "flag to set the path to the configuration file")
 	flag.Parse()
 	// Extract the configuration from the configuration file
 	config, _ := configuration.ExtractConfiguration(*confPath)
