@@ -11,7 +11,8 @@ type DBTYPE string
 
 const (
 	MONGODB  DBTYPE = "mongodb"
-	DYNAMODB DBTYPE = "dynamodb"
+	DOCUMENTDB DBTYPE = "documentdb"
+  DYNAMODB DBTYPE = "dynamodb"
 )
 
 func NewPersistenceLayer(options DBTYPE, connection string) (persistence.DatabaseHandler, error) {
