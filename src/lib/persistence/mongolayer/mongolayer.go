@@ -41,11 +41,11 @@ func NewMongoDBLayer(connection string) (persistence.DatabaseHandler, error) {
 func (mongoLayer *MongoDBLayer) AddEvent(e persistence.Event) ([]byte, error) {
 	collection := mongoLayer.client.Database(DB).Collection(EVENTS)
 
-	if !e.ID.IsZero() {
+	if e.ID.IsZero() {
 		e.ID = primitive.NewObjectID()
 	}
 
-	if !e.Location.ID.IsZero() {
+	if e.Location.ID.IsZero() {
 		e.Location.ID = primitive.NewObjectID()
 	}
 

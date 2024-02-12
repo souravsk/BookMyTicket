@@ -11,6 +11,7 @@ type DBTYPE string
 
 const (
 	MONGODB  DBTYPE = "mongodb"
+	DOCUMENTDB DBTYPE = "documentdb"
 	DYNAMODB DBTYPE = "dynamodb"
 )
 

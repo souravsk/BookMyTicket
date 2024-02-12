@@ -2,7 +2,7 @@ package rest
 
 import (
 	"encoding/hex"
-	"fmt"
+	"log"
 	"net/http"
 	"strings"
 
@@ -10,37 +10,27 @@ import (
 	"github.com/souravsk/BookMyTicket/src/lib/persistence"
 )
 
-// eventServiceHandler: Defines a struct representing an event service handler.
 type eventServiceHandler struct {
 	dbhandler persistence.DatabaseHandler
-	//dbhandler: A field of type persistence.DatabaseHandler used to interact with the database.
 }
 
-// NewEventHandler: A function that creates and returns a new instance of eventServiceHandler.
-// It takes a databasehandler parameter and initializes the dbhandler field.
 func NewEventHandler(databasehandler persistence.DatabaseHandler) *eventServiceHandler {
 	return &eventServiceHandler{
 		dbhandler: databasehandler,
 	}
 }
 
-// FindEventHandler: A function to handle HTTP requests for finding an event based on certain criteria.
-// Uses gin.Context for request and response handling.
 func (eh *eventServiceHandler) FindEventHandler(c *gin.Context) {
 	criteria := c.Param("SearchCriteria")
 	searchkey := c.Param("search")
 
 	if criteria == "" || searchkey == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "No search criteria or search key found"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid search criteria or search key"})
 		return
 	}
 
 	var event persistence.Event
 	var err error
-
-	// Initialize event to an empty Event struct to avoid nil pointer dereference
-	event = persistence.Event{}
-
 	switch strings.ToLower(criteria) {
 	case "name":
 		event, err = eh.dbhandler.FindEventByName(searchkey)
@@ -50,41 +40,40 @@ func (eh *eventServiceHandler) FindEventHandler(c *gin.Context) {
 			event, err = eh.dbhandler.FindEvent(id)
 		}
 	}
-
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		log.Printf("Error finding event: %s", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error finding event"})
 		return
 	}
 
 	c.JSON(http.StatusOK, event)
 }
 
-// AllEventHandler: A function to handle HTTP requests for retrieving all available events.
 func (eh *eventServiceHandler) AllEventHandler(c *gin.Context) {
 	events, err := eh.dbhandler.FindAllAvailableEvents()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Error occurred while trying to find all available events %s", err)})
+		log.Printf("Error finding all events: %s", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error finding all events"})
 		return
 	}
 
 	c.JSON(http.StatusOK, events)
 }
 
-// NewEventHandler: A function to handle HTTP requests for creating a new event.
 func (eh *eventServiceHandler) NewEventHandler(c *gin.Context) {
 	var event persistence.Event
-	err := c.BindJSON(&event)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Error occurred while decoding event data %s", err)})
+	if err := c.BindJSON(&event); err != nil {
+		log.Printf("Error decoding event data: %s", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error decoding event data"})
 		return
 	}
 
 	id, err := eh.dbhandler.AddEvent(event)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Error occurred while persisting event %d %s", id, err)})
+		log.Printf("Error persisting event: %s", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error persisting event"})
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{"id": id})
-
 }
