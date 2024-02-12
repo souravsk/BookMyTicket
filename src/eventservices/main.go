@@ -10,7 +10,6 @@ import (
 )
 
 func main() {
-
 	confPath := flag.String("conf", `.\app\config.json`, "flag to set the path to the configuration json file")
 	flag.Parse()
 	//extract configuration

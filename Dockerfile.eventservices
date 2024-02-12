@@ -26,6 +26,7 @@ COPY --from=builder /go/src/github.com/souravsk/BookMyTicket/src/lib/configurati
 COPY --from=builder /go/src/github.com/souravsk/BookMyTicket/src/eventservices/eventservices /eventservices
 
 # Expose the port
+
 EXPOSE 8181
 
 # Command to run the application
